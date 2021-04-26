@@ -1,5 +1,6 @@
 # Autonomous_Rover
 Autonomous rover controlled using Raspberry Pi Brain and Arduino Controller
+### BEING WORKED ON INDEPENDENT BRANCHES TO NOT HAVE TO KEEP RPI FILES IN ARDUINO FOLDER AND ARDUINO FILES ON RPI
 
 ## Background
 This will be a multi-step longer term ongoing project I will work on that will, most likely, grow and develop into something more complex as time goes on. 
