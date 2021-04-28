@@ -21,7 +21,8 @@ const byte maskM1 = 16; // checks if motor 1 is activated   (turn  left if alone
 const byte maskRev = 8; // checks direction of movement     (1 for reverse, 0 for forward)
 const byte maskMot = 4; // checks if moving                 (1 to turn motor on);
 const byte maskHS  = 2; // checks if half speed             (1 halves motor speed, 0 doesn't)
-const byte maskLED = 1; // transmit LED on(idk here for now)(1 for LED on, 0 for LED off)
+//const byte maskLED = 1; // transmit LED on(idk here for now)(1 for LED on, 0 for LED off)
+const byte maskSTP = 1; // STOP DRIVING (probably important) 
 const byte maskRead = [maskHS,maskMot,maskRev,maskM1,maskM2,bitUlS];
 // */
 
@@ -84,6 +85,11 @@ void receiveEvent(int howMany){
       byte cmnd = I2C & maskRead[i]; 
       switch (cmnd)
       {
+        case maskSTP: 
+          byte mSpeed = 0;
+          analogWrite(enM1,mSpeed);
+          analogWrite(enM2,mSpeed);
+          break;
         case maskHS:
           digitalWrite(dir1M1,HIGH);
           digitalWrite(dir2M1,LOW);
