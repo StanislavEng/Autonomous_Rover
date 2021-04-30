@@ -4,13 +4,18 @@
  *  
  *  Start Date: April 24, 2021
  *  Written by: Stanislav Svichkar
- *  Last Modified: 
+ *  Last Modified: April 29, 2021
  */
 
+#include <Wire.h>
+
 // general setup
-const byte slaveAddress = 0x08; // this is the address of the slave device in I2C line
+//const byte slaveAddress = 0x08; // this is the address of the slave device in I2C line
+#define SLAVE_ADDR 8 // address slave for I2C 
+#define REP_SIZE  5 // 10 // maximum length of reply for I2C request   
 //byte LED = 12; // Will use to check incoming data on breadboard (as opposed to on Arduino via pin13)
 const byte readPin = 13; // Checks incoming data, either on Arduino alone or also hooked up on LED
+byte mSpeed;
 
 // masking setup
 const byte maskCmd=127; // does the below in one go
@@ -23,7 +28,7 @@ const byte maskMot = 4; // checks if moving                 (1 to turn motor on)
 const byte maskHS  = 2; // checks if half speed             (1 halves motor speed, 0 doesn't)
 //const byte maskLED = 1; // transmit LED on(idk here for now)(1 for LED on, 0 for LED off)
 const byte maskSTP = 1; // STOP DRIVING (probably important) 
-const byte maskRead = [maskHS,maskMot,maskRev,maskM1,maskM2,bitUlS];
+const byte maskRead[] = {maskHS,maskMot,maskRev,maskM1,maskM2,bitUlS};
 // */
 
 // Ultrasonic setup
@@ -45,15 +50,15 @@ byte m1Speed = 0;   // speed of left motors
 #define M2dir1 9   // IN+
 #define M2dir2 8   // IN-*/
 const byte enM2 = 10;
-const byte dir1M2 = 9;
+const byte dir2M1 = 9;
 const byte dir2M2 = 8;
 int m2Speed = 0;   // speed of right motors
 
-const byte setPin = [dir2M1, dir1M1, enM1, dir2M2, dir1M2, enM2];
+const byte setPin[] = {dir2M1, dir1M1, enM1, dir2M2, dir1M2, enM2}; // easier pinMode initilization
 
 
 void setup(){
-  Wire.begin(slaveAddress); // turns on wire as a slave
+  Wire.begin(SLAVE_ADDR); // turns on wire as a slave
   // Wire.begin(); // This indicates that the device is the master, not the slave
   Serial.begin(9600);
 
@@ -66,8 +71,9 @@ void setup(){
   digitalWrite(TRIG,LOW); // immediately sets low with internal pull down resistor
   
   Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
 
-  while (!Serial()){}
+   while (!Serial){}
   
 }
 
@@ -86,7 +92,7 @@ void receiveEvent(int howMany){
       switch (cmnd)
       {
         case maskSTP: 
-          byte mSpeed = 0;
+          mSpeed = 0;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -95,7 +101,7 @@ void receiveEvent(int howMany){
           digitalWrite(dir2M1,LOW);
           digitalWrite(dir1M2,HIGH);
           digitalWrite(dir2M2,LOW);
-          byte mSpeed = 127;
+          mSpeed = 127;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -104,7 +110,7 @@ void receiveEvent(int howMany){
           digitalWrite(dir2M1,LOW);
           digitalWrite(dir1M2,HIGH);
           digitalWrite(dir2M2,LOW);
-          byte mSpeed = 255;
+          mSpeed = 255;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -113,7 +119,7 @@ void receiveEvent(int howMany){
           digitalWrite(dir1M1,LOW);
           digitalWrite(dir2M2,HIGH);
           digitalWrite(dir1M2,LOW);
-          byte mSpeed = 255;
+          mSpeed = 255;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -122,7 +128,7 @@ void receiveEvent(int howMany){
           digitalWrite(dir2M1,LOW);
           digitalWrite(dir2M2,HIGH);
           digitalWrite(dir1M2,LOW);
-          byte mSpeed = 255;
+          mSpeed = 255;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -131,7 +137,7 @@ void receiveEvent(int howMany){
           digitalWrite(dir1M1,LOW);
           digitalWrite(dir1M2,HIGH);
           digitalWrite(dir2M2,LOW);
-          byte mSpeed = 255;
+          mSpeed = 255;
           analogWrite(enM1,mSpeed);
           analogWrite(enM2,mSpeed);
           break;
@@ -141,10 +147,24 @@ void receiveEvent(int howMany){
           digitalWrite(TRIG,HIGH);
           delay(10);
           digitalWrite(TRIG,LOW);
-          pingTravel = pulseIn(Echo,HIGH)
+          pingTravel = pulseIn(ECHO,HIGH);
           delay(25);
           break;
       }
     }
   }
+}
+
+void requestEvent(){
+  byte response[REP_SIZE];
+  digitalWrite(TRIG,HIGH);
+  delay(10);
+  digitalWrite(TRIG,LOW);
+  delay(10);
+  pingTravel = pulseIn(ECHO,HIGH);
+  delay(25);
+  //for (byte i = 0; i < REP_SIZE; i++){ 
+  //}
+  Wire.write(pingTravel);//,sizeof(pingTravel));
+  
 }
