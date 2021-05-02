@@ -42,9 +42,9 @@ This may be using one of the official Rpi camera modules and/or may be an ESP32 
 I may eventually take the Rpi off this, to become more battery efficient. (I haven't planned the mobile system details fully just yet).
 
 The rest will probably come as I work on stuff and see how things do or do not work out. 
-
-
-
-
-#### note to self, when installing OpenCV, use pip for learning versions  
+  
+  
+  
+  
+#### note to self, when installing OpenCV, use pip for learning versions 
 #### not to self #2, when installing OpenCV with Pip, force a <4.3 to make it a reasonable time to install
